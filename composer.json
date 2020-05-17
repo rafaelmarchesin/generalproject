@@ -1,0 +1,13 @@
+{
+    "name": "app/generalproject",
+    "description": "Um projeto bem genérico!",
+    "authors": [
+        {
+            "name": "Rafael Marchesin",
+            "email": "rmarchesin@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/polyfill-php56": "^1.17"
+    }
+}
