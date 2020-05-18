@@ -22,7 +22,7 @@ services:
         networks: 
             - app
     db:
-        image: mysql:5.6
+        image: mysql
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: todo_list_db
