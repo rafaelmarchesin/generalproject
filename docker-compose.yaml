@@ -1,0 +1,27 @@
+version: '3'
+
+services: 
+    nginx:
+        build:
+            context: .
+            dockerfile: Dockerfile-nginx
+        volumes: 
+            - .:/var/www/app/
+        ports: 
+            - 8001:80
+        networks: 
+            - app
+    php:
+        build: 
+            context: .
+            dockerfile: Dockerfile-php
+        environment: 
+            APP_ENV: dev
+        volumes: 
+            - .:/var/www/app/
+        networks: 
+            - app
+
+networks: 
+    app:
+        
