@@ -5,8 +5,22 @@
 {% block body %}
     <h1>Lista de Tarefas</h1>
 
-    <form>
-        <label>Insira a tarefa: </label>
-        <input type="text" />
-    </form>
+    <div class="card" style="width: 22rem;">
+        <div class="card-body">
+            <form method="POST" action="/task">
+                <div class="">
+                    <label for="task" class="card-subtitle">Insira a tarefa: </label>
+                    <input type="text" name="task" class="form-control" />
+                </div>
+                <div class="mt-2">
+                    <input type="submit" class="btn btn-primary" />
+                </div>
+            </form>
+            {#
+            {% if condition %}
+
+            {% endif %}
+            #}
+        </div>
+    </div>
 {% endblock %}
