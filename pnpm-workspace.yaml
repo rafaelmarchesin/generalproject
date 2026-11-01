@@ -1,0 +1,5 @@
+packages:
+  - "compartilhado/*"
+  - "projetos/*/apps/*"
+  - "projetos/*/packages/*"
+  - "projetos/*/functions"

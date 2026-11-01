@@ -1,0 +1,24 @@
+{
+  "name": "generalproject",
+  "private": true,
+  "description": "Monorepo de projetos de oportunidade. Projeto atual: projetos/projeto-x.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "dev:x": "pnpm --filter @projeto-x/player dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.6.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

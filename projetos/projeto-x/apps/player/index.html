@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Você recebeu um presente</title>
+  <meta property="og:title" content="Você recebeu um presente">
+  <meta property="og:description" content="Toque para abrir.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Figtree:wght@400;600;800&display=swap">
+  <link rel="stylesheet" href="./src/player.css">
+</head>
+<body>
+  <main class="stage">
+    <p class="banner" id="banner">Carregando o presente…</p>
+    <div class="console" id="console" data-shell="amarelo">
+      <div class="bezel">
+        <div class="bezel-top"><span class="led" id="led"></span><span>POWER</span></div>
+        <canvas id="screen" aria-label="Tela do jogo. Use as setas, A e Start."></canvas>
+        <div class="bezel-brand"><span>PROJETO X</span><em>9999 em 1 ♥</em></div>
+      </div>
+      <div class="dpad" role="group" aria-label="Direcional">
+        <button class="k up" data-k="up" aria-label="Cima"></button>
+        <button class="k left" data-k="left" aria-label="Esquerda"></button>
+        <span class="k mid" aria-hidden="true"></span>
+        <button class="k right" data-k="right" aria-label="Direita"></button>
+        <button class="k down" data-k="down" aria-label="Baixo"></button>
+      </div>
+      <div class="ab" role="group" aria-label="Botões de ação">
+        <button class="k b" data-k="b" aria-label="Botão B">B</button>
+        <button class="k a" data-k="a" aria-label="Botão A">A</button>
+      </div>
+      <div class="sys">
+        <button class="k pill" data-k="select" aria-label="Select: recomeçar">SELECT</button>
+        <button class="k pill" data-k="start" aria-label="Start">START</button>
+      </div>
+      <div class="grill" aria-hidden="true"></div>
+      <button class="power" id="power" type="button">Ligar o console</button>
+    </div>
+    <p class="hint"><span class="kbd">←↑→↓</span> mover · <span class="kbd">Z</span> A · <span class="kbd">X</span> B · <span class="kbd">ENTER</span> start</p>
+    <p class="hint"><button class="link" id="mute" type="button">Som: ligado</button></p>
+  </main>
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>

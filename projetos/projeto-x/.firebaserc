@@ -1,0 +1,10 @@
+{
+  "projects": {
+    "dev": "projetox-dev",
+    "prod": "projetox-prod"
+  },
+  "targets": {
+    "projetox-dev": { "hosting": { "player": ["projetox-dev"] } },
+    "projetox-prod": { "hosting": { "player": ["projetox-prod"] } }
+  }
+}
