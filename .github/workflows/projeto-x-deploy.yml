@@ -1,0 +1,41 @@
+name: Projeto X - publicar
+
+# Publicação manual (Actions → Projeto X - publicar → Run workflow).
+# Precisa de: variável PROJETO_X_FIREBASE_DEV / PROJETO_X_FIREBASE_PROD e
+# segredo PROJETO_X_FIREBASE_SA_DEV / PROJETO_X_FIREBASE_SA_PROD.
+on:
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: Onde publicar
+        type: choice
+        options: [dev, prod]
+        default: dev
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ambiente }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - name: Parâmetros das funções
+        env:
+          PROJETO: ${{ inputs.ambiente == 'prod' && vars.PROJETO_X_FIREBASE_PROD || vars.PROJETO_X_FIREBASE_DEV }}
+        run: |
+          printf 'PUBLIC_BASE_URL=%s\nMAIL_FROM=%s\n' "${{ vars.PROJETO_X_PUBLIC_BASE_URL || format('https://{0}.web.app', env.PROJETO) }}" "${{ vars.PROJETO_X_MAIL_FROM || 'Projeto X <onboarding@resend.dev>' }}" > "projetos/projeto-x/functions/.env.$PROJETO"
+      - run: pnpm x:hosting
+      - name: Credenciais
+        run: echo '${{ inputs.ambiente == 'prod' && secrets.PROJETO_X_FIREBASE_SA_PROD || secrets.PROJETO_X_FIREBASE_SA_DEV }}' > "$RUNNER_TEMP/sa.json"
+      - name: Publicar hosting, funções e regras
+        working-directory: projetos/projeto-x
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+          PROJETO: ${{ inputs.ambiente == 'prod' && vars.PROJETO_X_FIREBASE_PROD || vars.PROJETO_X_FIREBASE_DEV }}
+        run: npx --yes firebase-tools@13 deploy --project "$PROJETO" --only hosting,functions,firestore --force --non-interactive

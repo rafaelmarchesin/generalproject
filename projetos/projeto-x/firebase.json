@@ -1,13 +1,23 @@
 {
-  "hosting": [
-    {
-      "target": "player",
-      "public": "apps/player/dist",
-      "ignore": ["**/*.map"],
-      "headers": [
-        { "source": "**", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
-        { "source": "/assets/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
-      ]
-    }
-  ]
+  "hosting": {
+    "public": "hosting",
+    "ignore": ["**/*.map"],
+    "cleanUrls": true,
+    "rewrites": [
+      { "source": "/api/**", "function": { "functionId": "api", "region": "southamerica-east1" } },
+      { "source": "/p/**", "destination": "/p/index.html" }
+    ],
+    "headers": [
+      { "source": "/p/**", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }, { "key": "Referrer-Policy", "value": "no-referrer" }] },
+      { "source": "**/assets/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+    ]
+  },
+  "functions": [{ "source": "functions/deploy", "codebase": "default", "runtime": "nodejs22" }],
+  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json", "location": "southamerica-east1" },
+  "emulators": {
+    "functions": { "port": 5001 },
+    "firestore": { "port": 8080 },
+    "hosting": { "port": 5000 },
+    "ui": { "enabled": false }
+  }
 }

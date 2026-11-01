@@ -11,7 +11,8 @@
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "dev:x": "pnpm --filter @projeto-x/player dev",
-    "dev:x-editor": "pnpm --filter @projeto-x/editor dev"
+    "dev:x-editor": "pnpm --filter @projeto-x/editor dev",
+    "x:hosting": "pnpm --filter '@projeto-x/*' build && node projetos/projeto-x/scripts/montar-hosting.mjs"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

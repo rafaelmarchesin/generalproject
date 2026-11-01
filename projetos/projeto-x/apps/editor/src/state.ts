@@ -6,6 +6,8 @@ export interface Draft {
   plan: PlanId;
   addons: AddonId[];
   email: string;
+  /** Lacre e senha (pacote Completo). opensAt no formato do campo datetime-local. */
+  delivery: { opensAt?: string; question?: string; answer?: string };
   /** Campos que a pessoa já editou: trocar a ocasião não apaga o que ela escreveu. */
   touched: string[];
 }
@@ -17,12 +19,13 @@ export type Action =
   | { type: 'plan'; plan: PlanId }
   | { type: 'addon'; addon: AddonId; on: boolean }
   | { type: 'email'; email: string }
+  | { type: 'delivery'; delivery: Draft['delivery'] }
   | { type: 'reset' };
 
 export const STEPS = ['Ocasião', 'Personagens', 'Memórias', 'Quiz', 'Mensagens', 'Visual', 'Prévia e pacote'] as const;
 
 export function initialDraft(): Draft {
-  return { config: demoConfig('namoro'), step: 0, plan: 'completo', addons: [], email: '', touched: [] };
+  return { config: demoConfig('namoro'), step: 0, plan: 'completo', addons: [], email: '', delivery: {}, touched: [] };
 }
 
 export function reducer(d: Draft, a: Action): Draft {
@@ -62,6 +65,7 @@ export function reducer(d: Draft, a: Action): Draft {
     case 'plan': return { ...d, plan: a.plan };
     case 'addon': return { ...d, addons: a.on ? [...new Set([...d.addons, a.addon])] : d.addons.filter((x) => x !== a.addon) };
     case 'email': return { ...d, email: a.email };
+    case 'delivery': return { ...d, delivery: { ...d.delivery, ...a.delivery } };
     case 'reset': return initialDraft();
   }
 }
@@ -73,7 +77,7 @@ export function loadDraft(): Draft | null {
     const raw = localStorage.getItem(KEY);
     if (!raw) return null;
     const d = JSON.parse(raw) as Draft;
-    return d?.config?.schemaVersion === 1 ? d : null;
+    return d?.config?.schemaVersion === 1 ? { ...initialDraft(), ...d } : null;
   } catch { return null; }
 }
 

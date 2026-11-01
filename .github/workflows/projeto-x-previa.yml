@@ -1,8 +1,9 @@
 name: Projeto X - prévia no Firebase
 
-# Publica uma prévia (canal temporário do Firebase Hosting) a cada pull request.
-# Só roda depois de configurar no GitHub:
-#   variável  PROJETO_X_FIREBASE_DEV  = id do projeto de desenvolvimento (ex.: projetox-dev)
+# A cada pull request, publica o site num canal temporário do Firebase Hosting.
+# As chamadas /api usam as funções já publicadas no projeto de desenvolvimento.
+# Só roda depois de configurar no GitHub (Settings → Secrets and variables → Actions):
+#   variável  PROJETO_X_FIREBASE_DEV    = id do projeto de desenvolvimento (ex.: projetox-dev)
 #   segredo   PROJETO_X_FIREBASE_SA_DEV = JSON da conta de serviço desse projeto
 on:
   pull_request:
@@ -24,12 +25,11 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @projeto-x/player... build
+      - run: pnpm x:hosting
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.PROJETO_X_FIREBASE_SA_DEV }}
           projectId: ${{ vars.PROJETO_X_FIREBASE_DEV }}
           entryPoint: projetos/projeto-x
-          target: player
           expires: 14d

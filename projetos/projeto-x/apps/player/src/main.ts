@@ -1,24 +1,62 @@
 import { Game, H, loadAssets, W, type Key } from '@projeto-x/engine';
 import { demoConfig, giftConfigSchema, OCCASIONS, type GiftConfig, type Occasion } from '@projeto-x/shared';
+import { fetchGift, sendEvent, slugFromPath, type GiftView } from './api.js';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
-/**
- * Por enquanto o presente vem de um exemplo (?ocasiao=pedido). Na etapa M2,
- * o código secreto do link será trocado pela configuração vinda do servidor.
- */
-function readConfig(): GiftConfig {
+/** Sem código no endereço, mostra um exemplo (?ocasiao=pedido ou #pedido). */
+function demoFromUrl(): GiftConfig {
   const params = new URLSearchParams(location.search);
   const occ = params.get('ocasiao') ?? location.hash.slice(1);
   const occasion: Occasion = OCCASIONS.includes(occ as Occasion) ? (occ as Occasion) : 'namoro';
   return giftConfigSchema.parse(demoConfig(occasion));
 }
 
+const slug = slugFromPath(location.pathname);
+/** ?teste=1: quem comprou joga antes, sem contar como aberto. */
+const testMode = new URLSearchParams(location.search).has('teste');
+
+/** Busca o presente; resolve lacre e senha antes de liberar o jogo. */
+async function resolveConfig(): Promise<GiftConfig> {
+  if (!slug) return demoFromUrl();
+  let view: GiftView = await fetchGift(slug);
+  if (view.state === 'sealed') {
+    const v = view;
+    $('console').dataset.shell = v.shell;
+    $<HTMLButtonElement>('power').disabled = true;
+    const tick = () => {
+      const ms = new Date(v.opensAt).getTime() - Date.now();
+      if (ms <= 0) { location.reload(); return; }
+      const d = Math.floor(ms / 86_400_000), h = Math.floor(ms / 3_600_000) % 24, m = Math.floor(ms / 60_000) % 60, s = Math.floor(ms / 1000) % 60;
+      $('banner').textContent = `${v.giver} preparou um presente lacrado. Abre em ${d > 0 ? d + 'd ' : ''}${h}h ${m}min ${s}s.`;
+    };
+    tick(); setInterval(tick, 1000);
+    return new Promise(() => undefined);
+  }
+  while (view.state === 'password') {
+    const v = view;
+    $('console').dataset.shell = v.shell;
+    $('banner').textContent = `${v.giver} preparou um presente para você. Responda para abrir.`;
+    const form = $<HTMLFormElement>('senha');
+    form.hidden = false;
+    $('pergunta').textContent = v.question;
+    $('senha-erro').hidden = !v.wrong;
+    const answer = await new Promise<string>((resolve) => {
+      form.onsubmit = (e) => { e.preventDefault(); resolve($<HTMLInputElement>('resposta').value); };
+    });
+    view = await fetchGift(slug, answer);
+  }
+  $('senha').hidden = true;
+  if (view.state !== 'open') { location.reload(); return new Promise(() => undefined); }
+  return giftConfigSchema.parse(view.config);
+}
+
 async function boot(): Promise<void> {
-  const config = readConfig();
+  const config = await resolveConfig();
   const consoleEl = $('console');
   consoleEl.dataset.shell = config.shell;
   $('banner').textContent = `${config.giver.name} preparou um presente para você.`;
+  const track = (ev: 'opened' | 'finished') => { if (slug && !testMode) void sendEvent(slug, ev); };
 
   const assets = await loadAssets(config);
   // ?ajuda=1000 encurta o tempo até aparecer "pular fase" (útil em testes automáticos).
@@ -28,7 +66,7 @@ async function boot(): Promise<void> {
     config,
     assets,
     assistAfterMs: assist,
-    onEvent: (e) => { if (e.type === 'finished') $('banner').textContent = 'Fim? Não. Continua…'; },
+    onEvent: (e) => { if (e.type === 'finished') { $('banner').textContent = 'Fim? Não. Continua…'; track('finished'); } },
   });
   await document.fonts?.load("8px 'Press Start 2P'").catch(() => undefined);
   game.tick(0);
@@ -37,6 +75,7 @@ async function boot(): Promise<void> {
   power.addEventListener('click', () => {
     game.sfx.unlock();
     power.hidden = true;
+    track('opened');
     $('led').classList.add('on');
     document.documentElement.requestFullscreen?.().catch(() => undefined);
     game.start();
@@ -75,5 +114,5 @@ window.addEventListener('hashchange', () => location.reload());
 
 boot().catch((err) => {
   console.error(err);
-  $('banner').textContent = 'Não foi possível abrir o presente. Tente recarregar a página.';
+  $('banner').textContent = err instanceof Error && err.message ? err.message : 'Não foi possível abrir o presente. Tente recarregar a página.';
 });

@@ -1,0 +1,17 @@
+{
+  "extends": "@compartilhado/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": [
+      "ES2022"
+    ],
+    "types": [
+      "node"
+    ],
+    "noUncheckedIndexedAccess": false
+  },
+  "include": [
+    "src",
+    "scripts"
+  ]
+}

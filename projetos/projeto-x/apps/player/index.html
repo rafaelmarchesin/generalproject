@@ -39,6 +39,12 @@
       <div class="grill" aria-hidden="true"></div>
       <button class="power" id="power" type="button">Ligar o console</button>
     </div>
+    <form class="senha" id="senha" hidden>
+      <label for="resposta" id="pergunta">Pergunta</label>
+      <input id="resposta" type="text" autocomplete="off" required>
+      <button type="submit">Abrir</button>
+      <p id="senha-erro" class="erro" hidden>Não é essa. Tente de novo.</p>
+    </form>
     <p class="hint"><span class="kbd">←↑→↓</span> mover · <span class="kbd">Z</span> A · <span class="kbd">X</span> B · <span class="kbd">ENTER</span> start</p>
     <p class="hint"><button class="link" id="mute" type="button">Som: ligado</button></p>
   </main>

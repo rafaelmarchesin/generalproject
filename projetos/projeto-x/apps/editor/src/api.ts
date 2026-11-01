@@ -11,7 +11,9 @@ export interface PixCharge {
 
 const API = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api';
 
-export async function createOrder(input: { config: GiftConfig; plan: PlanId; addons: AddonId[]; email: string }): Promise<PixCharge> {
+export interface DeliveryInput { opensAt?: string; password?: { question: string; answer: string } }
+
+export async function createOrder(input: { config: GiftConfig; plan: PlanId; addons: AddonId[]; email: string; delivery: DeliveryInput }): Promise<PixCharge> {
   try {
     const res = await fetch(`${API}/pedidos`, {
       method: 'POST',

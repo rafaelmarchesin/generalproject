@@ -10,7 +10,7 @@ Presente digital: um mini game retrô em pixel art estrelado por quem recebe. Co
 | `packages/engine` | Motor do jogo: console, 4 fases, 5 finais, sons, pixelização | Pronto (M1) |
 | `apps/player` | Página onde o presente é aberto | Pronto com exemplos (M1); dados reais na M2 |
 | `apps/editor` | Criação do jogo em 7 passos, recorte do rosto, prévia jogável e checkout | Pronto (M2); pagamento em modo demonstração até o back-end entrar |
-| `functions` | Pedidos, Mercado Pago, entrega, nota fiscal, e-mails | M2 |
+| `functions` | API: pedidos, Pix do Mercado Pago, aviso de pagamento, publicação do presente, lacre e senha, e-mails | Pronto (M2), falta publicar; nota fiscal na M3 |
 | `apps/site` | Páginas de venda | M3 |
 | `prototipo` | Protótipo original, mantido como referência | Congelado |
 
@@ -22,6 +22,14 @@ pnpm --filter @projeto-x/editor dev   # editor em http://localhost:5174
 # http://localhost:5173/?ocasiao=namoro   (namoro, pedido, natal, cha, aniversario)
 # &ajuda=1000  faz o "B: pular fase" aparecer depois de 1 segundo
 ```
+
+## Rodar tudo localmente (Mercado Pago simulado)
+
+```bash
+pnpm x:hosting                                   # compila editor, player e funções
+pnpm --filter @projeto-x/functions dev           # http://localhost:5050
+```
+O Pix simulado é aprovado sozinho 4 segundos depois de gerado, e os e-mails aparecem no terminal.
 
 ## Configuração do Firebase (feita uma vez)
 
@@ -35,6 +43,22 @@ pnpm --filter @projeto-x/editor dev   # editor em http://localhost:5174
 
 Com isso, todo pull request ganha uma prévia publicada automaticamente.
 
-## Mercado Pago
+## Segredos e parâmetros das funções
 
-As credenciais de teste (Public Key e Access Token) vão para os segredos do Firebase na M2, nunca para o código.
+Cadastrados uma vez por projeto, pelo terminal (nunca no código nem no chat):
+
+```bash
+cd projetos/projeto-x
+npx firebase-tools@13 functions:secrets:set MP_ACCESS_TOKEN   --project projetox-dev   # Access Token de TESTE do Mercado Pago
+npx firebase-tools@13 functions:secrets:set MP_WEBHOOK_SECRET --project projetox-dev   # assinatura secreta dos webhooks (painel do Mercado Pago)
+npx firebase-tools@13 functions:secrets:set RESEND_API_KEY    --project projetox-dev   # chave do Resend (e-mails)
+```
+
+Parâmetros não secretos (`PUBLIC_BASE_URL`, `MAIL_FROM`): o deploy pergunta na primeira vez, ou use o modelo `functions/.env.example`.
+
+No painel do Mercado Pago (Suas integrações → Webhooks), cadastrar a URL
+`https://projetox-dev.web.app/api/webhooks/mercadopago` com o evento "Pagamentos".
+
+## Publicar
+
+GitHub → Actions → "Projeto X - publicar" → Run workflow (dev ou prod).
