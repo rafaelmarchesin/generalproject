@@ -213,4 +213,5 @@ Para cada finalista:
 | `plano-apps-nuvemshop.md` | App de revenda/consignado na Nuvemshop (descartado por complexidade) |
 | `tres-oportunidades-diretorios.md` | Casas de repouso, psicólogos para brasileiros no exterior, autismo |
 | `plano-jogo-personalizado.md` | **Plano completo do jogo retrô personalizado de presente** (técnica, finanças, marketing, calendário, implementação) |
+| `projeto-x-concepcao.md` | **Concepção completa do Projeto X** (cópia em texto do documento com gráficos) |
 | `00-mapa-de-oportunidades.md` | **Este documento**: visão geral, jogo personalizado de presente e processo de decisão |
