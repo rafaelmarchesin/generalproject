@@ -11,6 +11,7 @@ import { runnerScene } from './scenes/runner.js';
 import { quizScene } from './scenes/quiz.js';
 import { fishingScene } from './scenes/fishing.js';
 import { finaleScene } from './scenes/finale.js';
+import { previewEndScene } from './scenes/preview-end.js';
 
 export type Key = 'up' | 'down' | 'left' | 'right' | 'a' | 'b' | 'start' | 'select';
 
@@ -42,6 +43,8 @@ export interface GameOptions {
   onEvent?: (e: GameEvent) => void;
   /** Tempo parado numa fase antes de oferecer "pular" (ms). */
   assistAfterMs?: number;
+  /** Modo prévia do editor: depois desta quantidade de fases, mostra a tela "o resto é surpresa". */
+  previewPhases?: number;
 }
 
 /** Carrega avatares e memórias da configuração; o que faltar vira arte de exemplo. */
@@ -75,6 +78,7 @@ export class Game {
   private running = false;
   private readonly onEvent?: (e: GameEvent) => void;
   private readonly assistAfterMs: number;
+  private readonly previewPhases?: number;
   private stars = Array.from({ length: 30 }, (_, i) => ({ x: (i * 53) % W, y: (i * 37) % H, t: i * 97 }));
 
   constructor(opts: GameOptions) {
@@ -83,6 +87,7 @@ export class Game {
     this.assets = opts.assets ?? { giver: defaultGiver(), receiver: defaultReceiver(), memories: opts.config.memories.map((_, i) => memoryScene(i)) };
     this.onEvent = opts.onEvent;
     this.assistAfterMs = opts.assistAfterMs ?? 40_000;
+    this.previewPhases = opts.previewPhases;
     this.go(titleScene(this));
   }
 
@@ -149,6 +154,7 @@ export class Game {
   nextStage(): void {
     this.stage += 1;
     if (this.stage === 0) this.onEvent?.({ type: 'start' });
+    if (this.previewPhases !== undefined && this.stage >= this.previewPhases) { this.go(previewEndScene(this)); return; }
     const kind = this.stages[this.stage];
     if (!kind) return;
     this.go(cardScene(this, this.stage, kind, () => this.go(this.phaseScene(kind))));

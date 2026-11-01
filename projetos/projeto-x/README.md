@@ -9,7 +9,7 @@ Presente digital: um mini game retrô em pixel art estrelado por quem recebe. Co
 | `packages/shared` | Formato do presente (validação com zod), pacotes, preços e textos de exemplo | Pronto (M1) |
 | `packages/engine` | Motor do jogo: console, 4 fases, 5 finais, sons, pixelização | Pronto (M1) |
 | `apps/player` | Página onde o presente é aberto | Pronto com exemplos (M1); dados reais na M2 |
-| `apps/editor` | Criação do jogo, prévia e pagamento | M2 |
+| `apps/editor` | Criação do jogo em 7 passos, recorte do rosto, prévia jogável e checkout | Pronto (M2); pagamento em modo demonstração até o back-end entrar |
 | `functions` | Pedidos, Mercado Pago, entrega, nota fiscal, e-mails | M2 |
 | `apps/site` | Páginas de venda | M3 |
 | `prototipo` | Protótipo original, mantido como referência | Congelado |
@@ -17,7 +17,8 @@ Presente digital: um mini game retrô em pixel art estrelado por quem recebe. Co
 ## Testar o player
 
 ```bash
-pnpm dev:x
+pnpm dev:x            # player
+pnpm --filter @projeto-x/editor dev   # editor em http://localhost:5174
 # http://localhost:5173/?ocasiao=namoro   (namoro, pedido, natal, cha, aniversario)
 # &ajuda=1000  faz o "B: pular fase" aparecer depois de 1 segundo
 ```

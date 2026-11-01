@@ -10,7 +10,8 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "dev:x": "pnpm --filter @projeto-x/player dev"
+    "dev:x": "pnpm --filter @projeto-x/player dev",
+    "dev:x-editor": "pnpm --filter @projeto-x/editor dev"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

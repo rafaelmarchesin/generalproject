@@ -58,14 +58,17 @@ export function memoryScene(kind: number): HTMLCanvasElement {
  * Transforma uma imagem em pixel art: recorte central na proporção pedida, redução
  * por média de área, contraste e paleta limitada. Roda no aparelho de quem compra.
  */
-export function pixelize(img: CanvasImageSource & { width: number; height: number }, w: number, h: number, levels = 5): HTMLCanvasElement {
+export interface Crop { x: number; y: number; w: number; h: number }
+
+export function pixelize(img: CanvasImageSource & { width: number; height: number }, w: number, h: number, levels = 5, crop?: Crop): HTMLCanvasElement {
   const c = canvas(w, h);
   const x = c.getContext('2d', { willReadFrequently: true })!;
   const ar = w / h;
   const iw = (img as HTMLImageElement).naturalWidth || img.width;
   const ih = (img as HTMLImageElement).naturalHeight || img.height;
   let sw = iw, sh = ih, sx = 0, sy = 0;
-  if (sw / sh > ar) { const nw = sh * ar; sx = (sw - nw) / 2; sw = nw; } else { const nh = sw / ar; sy = (sh - nh) / 2; sh = nh; }
+  if (crop) { sx = crop.x; sy = crop.y; sw = crop.w; sh = crop.h; }
+  else if (sw / sh > ar) { const nw = sh * ar; sx = (sw - nw) / 2; sw = nw; } else { const nh = sw / ar; sy = (sh - nh) / 2; sh = nh; }
   x.imageSmoothingEnabled = true;
   x.imageSmoothingQuality = 'high';
   x.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
@@ -91,4 +94,26 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error('Não foi possível carregar a imagem'));
     img.src = src;
   });
+}
+
+/**
+ * Personagem 16×16 a partir de uma foto: o rosto recortado vira pixel art (10×10)
+ * e é encaixado num corpo desenhado, para combinar com o resto do jogo.
+ */
+export function avatarFromPhoto(img: CanvasImageSource & { width: number; height: number }, crop: Crop, shirt: string = P.blue): HTMLCanvasElement {
+  const c = canvas(16, 16);
+  const x = c.getContext('2d')!;
+  x.imageSmoothingEnabled = false;
+  x.fillStyle = shirt; x.fillRect(3, 13, 10, 3);
+  x.fillStyle = '#d9a07a'; x.fillRect(7, 12, 2, 1);
+  const head = pixelize(img, 10, 11, 6, crop);
+  x.drawImage(head, 3, 1);
+  // cantos arredondados da cabeça
+  x.clearRect(3, 1, 1, 1); x.clearRect(12, 1, 1, 1); x.clearRect(3, 11, 1, 1); x.clearRect(12, 11, 1, 1);
+  return c;
+}
+
+/** Converte um canvas em data URL PNG (o que é salvo no presente). */
+export function toDataURL(c: HTMLCanvasElement): string {
+  return c.toDataURL('image/png');
 }
